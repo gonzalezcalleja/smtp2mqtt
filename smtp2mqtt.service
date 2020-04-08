@@ -1,0 +1,22 @@
+[Unit]
+Description=smtp2mqtt
+After=network-online.target
+
+[Service]
+Type=simple
+PIDFile=/var/run/smtp2mqtt.pid
+User=root
+ExecStart=/home/jgonzalez/homeassistant-venv/bin/python3.7 /etc/home-assistance/smtp2mqtt.py \
+          --mqtttopic "doorbell/entrada" \
+          --mqtthost 127.0.0.1 --mqttport 1883 \
+          --mqttusername homeassistant --mqttpassword 123456 \
+          --smtphost 192.168.1.1 --smtpport 1125 \
+          --smtpusername doorbell@doorbell.local --smtppassword secret
+ExecReload=/bin/kill -1 -- $MAINPID
+ExecStop=/bin/kill -- $MAINPID
+Restart=on-failure
+RestartSec=5s
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
